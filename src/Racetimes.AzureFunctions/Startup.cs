@@ -1,8 +1,5 @@
 ﻿using EventFlow;
-using EventFlow.Configuration;
 using EventFlow.Extensions;
-using EventFlow.MsSql;
-using EventFlow.MsSql.EventStores;
 using EventFlow.MsSql.Extensions;
 using EventFlow.Snapshots.Strategies;
 using log4net;

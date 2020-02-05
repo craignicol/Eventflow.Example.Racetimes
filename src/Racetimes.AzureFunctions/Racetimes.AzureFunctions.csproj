@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AzureFunctionsVersion>v3</AzureFunctionsVersion>
+    <AzureFunctionsVersion>v2</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="EventFlow" Version="0.77.4077" />
@@ -13,9 +13,9 @@
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Racetimes.Domain\Racetimes.Domain.csproj" />
-    <ProjectReference Include="..\src\Racetimes.ReadModel.EntityFramework\Racetimes.ReadModel.EntityFramework.csproj" />
-    <ProjectReference Include="..\src\Racetimes.ReadModel.MsSQL\Racetimes.ReadModel.MsSql.csproj" />
+    <ProjectReference Include="..\Racetimes.Domain\Racetimes.Domain.csproj" />
+    <ProjectReference Include="..\Racetimes.ReadModel.EntityFramework\Racetimes.ReadModel.EntityFramework.csproj" />
+    <ProjectReference Include="..\Racetimes.ReadModel.MsSQL\Racetimes.ReadModel.MsSql.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
