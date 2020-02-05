@@ -11,7 +11,7 @@ namespace Racetimes.ReadModel.EntityFramework
         public DbContextProvider(string msSqlConnectionString)
         {
             _options = new DbContextOptionsBuilder<ExampleDbContext>()
-                .UseSqlServer(@"Data Source=localhost;Initial Catalog=TimesEF;Integrated Security=SSPI;")
+                .UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TimesEF;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
                 .Options;
         }
 

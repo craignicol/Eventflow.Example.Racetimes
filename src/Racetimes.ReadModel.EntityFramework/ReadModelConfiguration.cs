@@ -15,7 +15,7 @@ namespace Racetimes.ReadModel.EntityFramework
         {
             return efo
                 .RegisterServices(sr => sr.Register<IEntryLocator, EntryLocator>())
-                .RegisterServices(sr => sr.Register(c => @"Data Source=localhost;Initial Catalog=TimesEF;Integrated Security=SSPI;"))
+                .RegisterServices(sr => sr.Register(c => @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TimesEF;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"))
                 .UseEntityFrameworkReadModel<CompetitionReadModel, ExampleDbContext>()
                 .UseEntityFrameworkReadModel<EntryReadModel, ExampleDbContext, IEntryLocator>()
                 .AddQueryHandler<GetAllEntriesQueryHandler, GetAllEntriesQuery, EntryReadModel[]>()

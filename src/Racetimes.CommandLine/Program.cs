@@ -23,14 +23,17 @@ namespace Racetimes.CommandLine
     {
         static void Main(string[] args)
         {
+            /* 
+             * SETUP
+             */
             var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
             using (var resolver = EventFlowOptions.New
-                .AddEvents(typeof(CompetitionRegisteredEvent), typeof(CompetitionCorrectedEvent), typeof(CompetitionDeletedEvent), typeof(EntryRecordedEvent), typeof(EntryTimeCorrectedEvent))
-                .AddCommands(typeof(RegisterCompetitionCommand), typeof(CorrectCompetitionCommand), typeof(DeleteCompetitionCommand), typeof(RecordEntryCommand), typeof(CorrectEntryTimeCommand))
-                .AddCommandHandlers(typeof(RegisterCompetitionHandler), typeof(CorrectCompetitionHandler), typeof(DeleteCompetitionHandler), typeof(RecordEntryHandler), typeof(CorrectEntryTimeHandler))
-                .AddSnapshots(typeof(CompetitionSnapshot))
+                .AddEvents(Assembly.GetAssembly(typeof(CompetitionRegisteredEvent)))
+                .AddCommands(Assembly.GetAssembly(typeof(RegisterCompetitionCommand)), t => true)
+                .AddCommandHandlers(Assembly.GetAssembly(typeof(RegisterCompetitionHandler)))
+                .AddSnapshots(Assembly.GetAssembly(typeof(CompetitionSnapshot)), t => true)
                 .RegisterServices(sr => sr.Register(i => SnapshotEveryFewVersionsStrategy.Default))
                 .UseMssqlEventStore()
                 .UseMsSqlSnapshotStore()
@@ -41,6 +44,10 @@ namespace Racetimes.CommandLine
                 var msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
                 EventFlowEventStoresMsSql.MigrateDatabase(msSqlDatabaseMigrator);
                 // var sql = EventFlowEventStoresMsSql.GetSqlScripts().Select(s => s.Content).ToArray();
+
+                /* 
+                 * USAGE
+                 */
 
                 // Create a new identity for our aggregate root
                 var exampleId = CompetitionId.New;
@@ -74,7 +81,6 @@ namespace Racetimes.CommandLine
 
                 executionResult = commandBus.Publish(new DeleteCompetitionCommand(exampleId), CancellationToken.None);
             }
-            //Console.ReadLine();
         }
     }
 }

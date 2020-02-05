@@ -21,6 +21,14 @@ Extended features:
 - Delete on ReadModel
 - Snapshots
 
+# Getting Started
+
+## Requirements
+
+* .Net Core SDK 
+* SQL Server, with a database named `TimesEF`
+* Run the 2 `Create*.sql` scripts in the root folder
+
 # Racetimes (Domain)
 
 The domain of this project is storing times from races within competitions. Therefore competitions can be created, renamed and deleted. Racetimes (Entries) can be added and changed. These actions are far from complete but I think they are sufficient for an example.
@@ -28,6 +36,8 @@ The domain of this project is storing times from races within competitions. Ther
 # Note
 
 This is still a work in progress but I enjoy hearing from you (especially feedback on points I missed, got wrong or could do better).
+
+This is a fork of [dennisfabri's example](https://github.com/craignicol/Eventflow.Example.Racetimes.git) adapted to clean-up the start-up and to work with Azure Functions
 
 # Sources
 

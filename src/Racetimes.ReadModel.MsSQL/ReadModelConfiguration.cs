@@ -18,7 +18,7 @@ namespace Racetimes.ReadModel.MsSql
                 .UseMssqlReadModel<CompetitionReadModel>()
                 .UseMssqlReadModel<EntryReadModel, IEntryLocator>()
                 .AddQueryHandler<GetAllEntriesQueryHandler, GetAllEntriesQuery, EntryReadModel[]>()
-                .ConfigureMsSql(MsSqlConfiguration.New.SetConnectionString(@"Data Source=localhost;Initial Catalog=TimesEF;Integrated Security=SSPI;"));
+                .ConfigureMsSql(MsSqlConfiguration.New.SetConnectionString(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TimesEF;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"));
         }
 
         public static CompetitionReadModel Query(IRootResolver resolver, CompetitionId exampleId)
