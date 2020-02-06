@@ -12,6 +12,7 @@ using EventFlow;
 using Racetimes.Domain.Command;
 using System.Threading;
 using Racetimes.Domain.Identity;
+using Racetimes.AzureFunctions.Models;
 
 namespace Racetimes.AzureFunctions
 {
@@ -57,20 +58,20 @@ namespace Racetimes.AzureFunctions
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "entry")] HttpRequest req,
             ILogger log)
         {
-            // TODO : Get these as parameters
-            var competitionId = CompetitionId.New;
+            EntryDTO data = await GetEntryData(req);
+            if (data == null)
+            {
+                return new BadRequestObjectResult("Must provide Entry details in POST body.");
+            }
+
+            var competitionId = CompetitionId.With(data.CompetitionId);
             var entryId = EntryId.New;
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-
-            var rnd = new Random();
-
-            RecordEntryCommand recordEntryCommand = new RecordEntryCommand(competitionId, entryId, data?.discipline ?? "No Discipline", data?.name ?? "No Name", data?.time ?? rnd.Next(0, 100000));
+            RecordEntryCommand recordEntryCommand = new RecordEntryCommand(competitionId, entryId, data.Discipline, data.Name, data.TimeInMillis);
             var result = await _eventFlow.PublishAsync(recordEntryCommand, CancellationToken.None);
 
             return result?.IsSuccess == true
-                ? (ActionResult)new OkObjectResult($"{JsonConvert.SerializeObject(recordEntryCommand)}")
+                ? (ActionResult)new OkObjectResult($"{recordEntryCommand.EntryId}")
                 : new BadRequestObjectResult("Cannot create new entry");
         }
 
@@ -79,10 +80,41 @@ namespace Racetimes.AzureFunctions
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = "entry/{id}")] HttpRequest req,
             ILogger log, string id)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            EntryDTO data = await GetEntryData(req);
+            if (data == null)
+            {
+                return new BadRequestObjectResult("Must provide Entry details in POST body.");
+            }
 
-            return new NotFoundObjectResult($"Entry {id} does not exist");
+            var competitionId = CompetitionId.With(data.CompetitionId);
+            var entryId = EntryId.With(id);
+
+            CorrectEntryTimeCommand correctEntryTimeCommand = new CorrectEntryTimeCommand(competitionId, entryId, data.TimeInMillis);
+            var result = await _eventFlow.PublishAsync(correctEntryTimeCommand, CancellationToken.None);
+
+            return result?.IsSuccess == true
+                ? (ActionResult)new OkObjectResult($"{JsonConvert.SerializeObject(correctEntryTimeCommand)}")
+                : new BadRequestObjectResult($"Cannot or did not update entry {id}");
+        }
+
+        private static async Task<EntryDTO> GetEntryData(HttpRequest req)
+        {
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic rawData = JsonConvert.DeserializeObject(requestBody);
+            if (rawData == null)
+            {
+                return null;
+            }
+
+            var data = new EntryDTO
+            {
+                CompetitionId = rawData?.CompetitionId ?? CompetitionId.New,
+                Discipline = rawData?.Discipline,
+                Name = rawData?.Name,
+                TimeInMillis = rawData?.TimeInMillis ?? -1
+            };
+
+            return data;
         }
     }
 }

@@ -16,12 +16,17 @@ using System.IO;
 using Racetimes.ReadModel.MsSql;
 using Racetimes.ReadModel.EntityFramework;
 using EventFlow.Snapshots.Strategies;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Text;
+using System.Threading.Tasks;
+using System;
 
 namespace Racetimes.CommandLine
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             /* 
              * SETUP
@@ -66,21 +71,51 @@ namespace Racetimes.CommandLine
                 ReadModel.MsSql.ReadModelConfiguration.Query(resolver, exampleId);
                 ReadModel.EntityFramework.ReadModelConfiguration.Query(resolver, exampleId);
 
-                var entry1Id = EntryId.New;
-                var entry2Id = EntryId.New;
-
-                executionResult = commandBus.Publish(new RecordEntryCommand(exampleId, entry1Id, "Discipline 1", "Name 1", 11111), CancellationToken.None);
-                executionResult = commandBus.Publish(new RecordEntryCommand(exampleId, entry2Id, "Discipline 2", "Name 2", 22222), CancellationToken.None);
-                executionResult = commandBus.Publish(new CorrectEntryTimeCommand(exampleId, entry1Id, 10000), CancellationToken.None);
-                executionResult = commandBus.Publish(new CorrectEntryTimeCommand(exampleId, entry2Id, 20000), CancellationToken.None);
-
-                for (int x = 1; x < 100; x++)
+                using (var http = new HttpClient())
                 {
-                    executionResult = commandBus.Publish(new CorrectEntryTimeCommand(exampleId, entry2Id, 2000 + x), CancellationToken.None);
-                }
+                    var comp = exampleId.ToString();
 
+                    var entry1Id = await RecordEntry(http, new { CompetitionId = comp, Discipline = "Discipline 1", Name = "Name 1", TimeInMillis = 11111 });
+                    var entry2Id = await RecordEntry(http, new { CompetitionId = comp, Discipline = "Discipline 2", Name = "Name 2", TimeInMillis = 22222 });
+                    await CorrectEntryTime(http, entry1Id, new { CompetitionId = comp, TimeInMillis = 10000 });
+                    await CorrectEntryTime(http, entry2Id, new { CompetitionId = comp, TimeInMillis = 20000 });
+
+                    for (int x = 1; x < 100; x++)
+                    {
+                        await CorrectEntryTime(http, entry2Id, new { CompetitionId = comp, TimeInMillis = 2000 + x });
+                    }
+
+                }
                 executionResult = commandBus.Publish(new DeleteCompetitionCommand(exampleId), CancellationToken.None);
             }
+        }
+
+        private static async Task<string> RecordEntry(HttpClient http, object data)
+        {
+            var json = JsonConvert.SerializeObject(data);
+            var stringContent = new StringContent(json, UnicodeEncoding.UTF8, "application/json");
+            Console.WriteLine($"Record Entry SEND: {json}");
+
+            var httpResult = await http.PostAsync("http://localhost:7071/api/entry", stringContent, CancellationToken.None);
+            httpResult.EnsureSuccessStatusCode();
+            var content = await httpResult.Content.ReadAsStringAsync();
+
+            Console.WriteLine($"Record Entry RECV: {content}");           
+            return content;
+        }
+
+        private static async Task<string> CorrectEntryTime(HttpClient http, string id, object data)
+        {
+            var json = JsonConvert.SerializeObject(data);
+            var stringContent = new StringContent(json, UnicodeEncoding.UTF8, "application/json");
+            Console.WriteLine($"Correct Entry SEND: {json}");
+
+            var httpResult = await http.PutAsync($"http://localhost:7071/api/entry/{id}", stringContent, CancellationToken.None);
+            httpResult.EnsureSuccessStatusCode();
+            var content = JsonConvert.DeserializeObject<dynamic>(await httpResult.Content.ReadAsStringAsync());
+
+            Console.WriteLine($"Correct Entry RECV: {content}");
+            return content.EntryId.ToString();
         }
     }
 }
