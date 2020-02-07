@@ -69,7 +69,8 @@ namespace Racetimes.CommandLine
                 executionResult = commandBus.Publish(new CorrectCompetitionCommand(exampleId, name2), CancellationToken.None);
 
                 ReadModel.MsSql.ReadModelConfiguration.Query(resolver, exampleId);
-                ReadModel.EntityFramework.ReadModelConfiguration.Query(resolver, exampleId);
+                var compModel = ReadModel.EntityFramework.ReadModelConfiguration.Query(resolver, exampleId);
+                Console.WriteLine($"{compModel.Competitionname} : {compModel.Id} @ {compModel.Version} // by {compModel.Username}");
 
                 using (var http = new HttpClient())
                 {
