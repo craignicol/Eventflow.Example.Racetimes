@@ -19,10 +19,12 @@ namespace Racetimes.AzureFunctions
     public class Entry
     {
         private readonly ICommandBus _eventFlow;
- 
-        public Entry(ICommandBus eventFlow)
+        private readonly IRootResolver _resolver;
+
+        public Entry(IRootResolver resolver)
         {
-            _eventFlow = eventFlow;
+            _eventFlow = resolver.Resolve<ICommandBus>();
+            _resolver = resolver;
         }
 
         [FunctionName("GetEntries")]
@@ -50,7 +52,25 @@ namespace Racetimes.AzureFunctions
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            return new NotFoundObjectResult($"Entry {id} does not exist");
+            if(string.IsNullOrWhiteSpace(id))
+            {
+                return new BadRequestObjectResult("Entry id is missing.");
+            }
+
+            var evt = ReadModel.EntityFramework.ReadModelConfiguration.GetEvent(_resolver, EntryId.With(id));
+
+            if (evt == null)
+            {
+                return new NotFoundObjectResult($"Entry {id} does not exist");
+            }
+
+            return new OkObjectResult(new EntryDTO
+            {
+                EventId = evt.Id,
+                Discipline = evt.Discipline,
+                Name = evt.Competitor,
+                TimeInMillis = evt.TimeInMillis
+            });
         }
 
         [FunctionName("PostEntry")]

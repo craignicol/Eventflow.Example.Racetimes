@@ -78,6 +78,9 @@ namespace Racetimes.CommandLine
 
                     var entry1Id = await RecordEntry(http, new { CompetitionId = comp, Discipline = "Discipline 1", Name = "Name 1", TimeInMillis = 11111 });
                     var entry2Id = await RecordEntry(http, new { CompetitionId = comp, Discipline = "Discipline 2", Name = "Name 2", TimeInMillis = 22222 });
+
+                    var getEntry = await GetEntry(http, entry1Id);
+
                     await CorrectEntryTime(http, entry1Id, new { CompetitionId = comp, TimeInMillis = 10000 });
                     await CorrectEntryTime(http, entry2Id, new { CompetitionId = comp, TimeInMillis = 20000 });
 
@@ -116,7 +119,17 @@ namespace Racetimes.CommandLine
             var content = JsonConvert.DeserializeObject<dynamic>(await httpResult.Content.ReadAsStringAsync());
 
             Console.WriteLine($"Correct Entry RECV: {content}");
-            return content.EntryId.ToString();
+            return content.entryId.ToString();
+        }
+
+        private static async Task<dynamic> GetEntry(HttpClient http, string id)
+        {
+            var httpResult = await http.GetAsync($"http://localhost:7071/api/entry/{id}", CancellationToken.None);
+            httpResult.EnsureSuccessStatusCode();
+            var content = JsonConvert.DeserializeObject<dynamic>(await httpResult.Content.ReadAsStringAsync());
+
+            Console.WriteLine($"Get Entry RECV: {content}");
+            return content;
         }
     }
 }

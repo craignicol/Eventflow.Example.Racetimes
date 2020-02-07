@@ -1,4 +1,5 @@
 ﻿using EventFlow;
+using EventFlow.Configuration;
 using EventFlow.Extensions;
 using EventFlow.MsSql.Extensions;
 using EventFlow.Snapshots.Strategies;
@@ -21,7 +22,7 @@ namespace Racetimes.AzureFunctions
 {
     public class Startup : FunctionsStartup
     {
-        private ICommandBus CreateEventFlow()
+        private IRootResolver CreateEventFlow()
         {
             var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
@@ -46,12 +47,12 @@ namespace Racetimes.AzureFunctions
             // EventFlowEventStoresMsSql.MigrateDatabase(msSqlDatabaseMigrator);
 
             // TODO : Create factory to resolve this
-            return resolver.Resolve<ICommandBus>();
+            return resolver;
         }
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services.AddSingleton(typeof(ICommandBus), CreateEventFlow());
+            builder.Services.AddSingleton(typeof(IRootResolver), CreateEventFlow());
         }
     }
 }

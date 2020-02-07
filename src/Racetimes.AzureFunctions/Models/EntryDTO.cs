@@ -10,5 +10,6 @@ namespace Racetimes.AzureFunctions.Models
         public string Discipline { get; internal set; }
         public string Name { get; internal set; }
         public int TimeInMillis { get; internal set; }
+        public string EventId { get; internal set; }
     }
 }
