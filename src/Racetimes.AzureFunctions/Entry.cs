@@ -13,18 +13,21 @@ using Racetimes.Domain.Command;
 using System.Threading;
 using Racetimes.Domain.Identity;
 using Racetimes.AzureFunctions.Models;
+using EventFlow.Queries;
+using Racetimes.ReadModel.EntityFramework;
+using System.Linq;
 
 namespace Racetimes.AzureFunctions
 {
     public class Entry
     {
         private readonly ICommandBus _eventFlow;
-        private readonly IRootResolver _resolver;
+        private readonly IQueryProcessor _queryProcessor;
 
         public Entry(IRootResolver resolver)
         {
             _eventFlow = resolver.Resolve<ICommandBus>();
-            _resolver = resolver;
+            _queryProcessor = resolver.Resolve<IQueryProcessor>();
         }
 
         [FunctionName("GetEntries")]
@@ -34,15 +37,24 @@ namespace Racetimes.AzureFunctions
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string name = req.Query["name"];
+            var evts = _queryProcessor.Process(new GetAllEntriesQuery(), CancellationToken.None);
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            if (evts == null)
+            {
+                return new NotFoundObjectResult($"Cannot get entries");
+            }
 
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            return new OkObjectResult(
+                from evt in evts                                      
+                select
+                new EntryDTO
+                {
+                    EventId = evt.Id,
+                    Discipline = evt.Discipline,
+                    Name = evt.Competitor,
+                    TimeInMillis = evt.TimeInMillis
+                }
+            );
         }
 
         [FunctionName("GetEntry")]
@@ -57,7 +69,7 @@ namespace Racetimes.AzureFunctions
                 return new BadRequestObjectResult("Entry id is missing.");
             }
 
-            var evt = ReadModel.EntityFramework.ReadModelConfiguration.GetEvent(_resolver, EntryId.With(id));
+            var evt = _queryProcessor.Process(new ReadModelByIdQuery<EntryReadModel>(EntryId.With(id)), CancellationToken.None);
 
             if (evt == null)
             {

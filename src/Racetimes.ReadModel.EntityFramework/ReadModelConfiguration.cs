@@ -32,14 +32,5 @@ namespace Racetimes.ReadModel.EntityFramework
             var queryProcessor = resolver.Resolve<IQueryProcessor>();
             return queryProcessor.Process(new ReadModelByIdQuery<CompetitionReadModel>(exampleId), CancellationToken.None);
         }
-
-        public static EntryReadModel GetEvent(IRootResolver resolver, EntryId eventId)
-        {
-            // Resolve the query handler and use the built-in query for fetching
-            // read models by identity to get our read model representing the
-            // state of our aggregate root
-            var queryProcessor = resolver.Resolve<IQueryProcessor>();
-            return queryProcessor.Process(new ReadModelByIdQuery<EntryReadModel>(eventId), CancellationToken.None);
-        }
     }
 }

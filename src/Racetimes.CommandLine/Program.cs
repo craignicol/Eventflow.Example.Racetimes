@@ -89,6 +89,7 @@ namespace Racetimes.CommandLine
                         await CorrectEntryTime(http, entry2Id, new { CompetitionId = comp, TimeInMillis = 2000 + x });
                     }
 
+                    await GetEntries(http);
                 }
                 executionResult = commandBus.Publish(new DeleteCompetitionCommand(exampleId), CancellationToken.None);
             }
@@ -119,7 +120,7 @@ namespace Racetimes.CommandLine
             var content = JsonConvert.DeserializeObject<dynamic>(await httpResult.Content.ReadAsStringAsync());
 
             Console.WriteLine($"Correct Entry RECV: {content}");
-            return content.entryId.ToString();
+            return content.EntryId.ToString();
         }
 
         private static async Task<dynamic> GetEntry(HttpClient http, string id)
@@ -129,6 +130,15 @@ namespace Racetimes.CommandLine
             var content = JsonConvert.DeserializeObject<dynamic>(await httpResult.Content.ReadAsStringAsync());
 
             Console.WriteLine($"Get Entry RECV: {content}");
+            return content;
+        }
+        private static async Task<dynamic> GetEntries(HttpClient http)
+        {
+            var httpResult = await http.GetAsync($"http://localhost:7071/api/entry", CancellationToken.None);
+            httpResult.EnsureSuccessStatusCode();
+            var content = JsonConvert.DeserializeObject<dynamic>(await httpResult.Content.ReadAsStringAsync());
+
+            Console.WriteLine($"Get Entries RECV: {content}");
             return content;
         }
     }
