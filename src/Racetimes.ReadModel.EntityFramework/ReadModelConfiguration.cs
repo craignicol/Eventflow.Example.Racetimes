@@ -1,4 +1,5 @@
 ﻿using EventFlow;
+using EventFlow.Aggregates;
 using EventFlow.Configuration;
 using EventFlow.EntityFramework;
 using EventFlow.EntityFramework.Extensions;

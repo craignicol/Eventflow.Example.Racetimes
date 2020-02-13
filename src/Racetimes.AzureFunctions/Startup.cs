@@ -1,5 +1,8 @@
 ﻿using EventFlow;
+using EventFlow.Configuration;
 using EventFlow.Extensions;
+using EventFlow.MsSql;
+using EventFlow.MsSql.EventStores;
 using EventFlow.MsSql.Extensions;
 using EventFlow.Snapshots.Strategies;
 using log4net;
@@ -21,7 +24,7 @@ namespace Racetimes.AzureFunctions
 {
     public class Startup : FunctionsStartup
     {
-        private ICommandBus CreateEventFlow()
+        private IRootResolver CreateEventFlow()
         {
             var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
@@ -40,18 +43,16 @@ namespace Racetimes.AzureFunctions
                 .AddEntityFrameworkReadModel()
                 .CreateResolver();
             
-            // TODO: Get migration working without SqlClient configuration errors
-            // TODO: Move migration into command line tool to be run on deployment
-            // var msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
-            // EventFlowEventStoresMsSql.MigrateDatabase(msSqlDatabaseMigrator);
+            // TODO: Move migration into a command line tool to be run on deployment
+            var msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
+            EventFlowEventStoresMsSql.MigrateDatabase(msSqlDatabaseMigrator);
 
-            // TODO : Create factory to resolve this
-            return resolver.Resolve<ICommandBus>();
+            return resolver;
         }
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services.AddSingleton(typeof(ICommandBus), CreateEventFlow());
+            builder.Services.AddSingleton(typeof(IRootResolver), CreateEventFlow());
         }
     }
 }
