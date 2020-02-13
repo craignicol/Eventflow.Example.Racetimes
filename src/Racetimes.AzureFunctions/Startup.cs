@@ -1,6 +1,8 @@
 ﻿using EventFlow;
 using EventFlow.Configuration;
 using EventFlow.Extensions;
+using EventFlow.MsSql;
+using EventFlow.MsSql.EventStores;
 using EventFlow.MsSql.Extensions;
 using EventFlow.Snapshots.Strategies;
 using log4net;
@@ -41,12 +43,10 @@ namespace Racetimes.AzureFunctions
                 .AddEntityFrameworkReadModel()
                 .CreateResolver();
             
-            // TODO: Get migration working without SqlClient configuration errors
-            // TODO: Move migration into command line tool to be run on deployment
-            // var msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
-            // EventFlowEventStoresMsSql.MigrateDatabase(msSqlDatabaseMigrator);
+            // TODO: Move migration into a command line tool to be run on deployment
+            var msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
+            EventFlowEventStoresMsSql.MigrateDatabase(msSqlDatabaseMigrator);
 
-            // TODO : Create factory to resolve this
             return resolver;
         }
 
