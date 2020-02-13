@@ -16,6 +16,9 @@ using Racetimes.AzureFunctions.Models;
 using EventFlow.Queries;
 using Racetimes.ReadModel.EntityFramework;
 using System.Linq;
+using Microsoft.Azure.EventGrid;
+using Microsoft.Azure.EventGrid.Models;
+using Microsoft.Extensions.Options;
 
 namespace Racetimes.AzureFunctions
 {
@@ -23,11 +26,26 @@ namespace Racetimes.AzureFunctions
     {
         private readonly ICommandBus _eventFlow;
         private readonly IQueryProcessor _queryProcessor;
+        private readonly IEventGridClient _eventGrid;
 
-        public Entry(IRootResolver resolver)
+        // TODO : Move this to Singleton lifecycle in Startup
+        private IEventGridClient CreateEventGridClient(IOptions<EventGrid> eventGridOptions)
+        {
+            var eventGridEndpoint = eventGridOptions.Value?.Endpoint;
+            var eventGridApiKey = eventGridOptions.Value?.Endpoint;
+
+            Console.Write($"Creating Event Grid Client for {eventGridEndpoint} with <{eventGridApiKey}>.");
+
+            TopicCredentials domainKeyCredentials = new TopicCredentials(eventGridApiKey);
+            EventGridClient client = new EventGridClient(domainKeyCredentials);
+            return client;
+        }
+
+        public Entry(IRootResolver resolver, IOptions<EventGrid> eventGridOptions)
         {
             _eventFlow = resolver.Resolve<ICommandBus>();
             _queryProcessor = resolver.Resolve<IQueryProcessor>();
+            _eventGrid = CreateEventGridClient(eventGridOptions);
         }
 
         [FunctionName("GetEntries")]

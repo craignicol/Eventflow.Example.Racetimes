@@ -1,8 +1,6 @@
 ﻿using EventFlow;
 using EventFlow.Configuration;
 using EventFlow.Extensions;
-using EventFlow.MsSql;
-using EventFlow.MsSql.EventStores;
 using EventFlow.MsSql.Extensions;
 using EventFlow.Snapshots.Strategies;
 using log4net;
@@ -44,14 +42,19 @@ namespace Racetimes.AzureFunctions
                 .CreateResolver();
             
             // TODO: Move migration into a command line tool to be run on deployment
-            var msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
-            EventFlowEventStoresMsSql.MigrateDatabase(msSqlDatabaseMigrator);
+            // var msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
+            // EventFlowEventStoresMsSql.MigrateDatabase(msSqlDatabaseMigrator);
 
             return resolver;
         }
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            /* var eventGridOptions = builder.Services.AddOptions<EventGrid>()
+                .Configure<IConfiguration>((settings, configuration) =>
+                {
+                    configuration.GetSection("EventGrid").Bind(settings);
+                }); */
             builder.Services.AddSingleton(typeof(IRootResolver), CreateEventFlow());
         }
     }

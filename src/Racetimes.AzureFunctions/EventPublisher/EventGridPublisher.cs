@@ -7,28 +7,16 @@ using System.Text;
 
 namespace Racetimes.AzureFunctions.EventPublisher
 {
-    class EventGrid
+    public class EventGridPublisher
     {
-        static void Publish(params EntryDTO[] entryEvents)
+        public static void Publish(IEventGridClient client, string endpoint, params EntryDTO[] entryEvents)
         {
-            // TODO: Enter values for <domain-name> and <region>. You can find this domain endpoint value
-            // in the "Overview" section in the "Event Grid Domains" blade in Azure Portal.
-            string domainEndpoint = "https://<YOUR-DOMAIN-NAME>.<REGION-NAME>-1.eventgrid.azure.net/api/events";
-
-            // TODO: Enter value for <domain-key>. You can find this in the "Access Keys" section in the
-            // "Event Grid Domains" blade in Azure Portal.
-            string domainKey = "<YOUR-DOMAIN-KEY>";
-
-            string domainHostname = new Uri(domainEndpoint).Host;
-            TopicCredentials domainKeyCredentials = new TopicCredentials(domainKey);
-            EventGridClient client = new EventGridClient(domainKeyCredentials);
-
-            client.PublishEventsAsync(domainHostname, GetEventsList(entryEvents)).GetAwaiter().GetResult();
+            client.PublishEventsAsync(endpoint, GetEventsList(entryEvents)).GetAwaiter().GetResult();
             Console.Write("Published events to Event Grid domain.");
             Console.ReadLine();
         }
 
-        static IList<EventGridEvent> GetEventsList(IEnumerable<EntryDTO> entries)
+        private static IList<EventGridEvent> GetEventsList(IEnumerable<EntryDTO> entries)
         {
             List<EventGridEvent> eventsList = new List<EventGridEvent>();
 
