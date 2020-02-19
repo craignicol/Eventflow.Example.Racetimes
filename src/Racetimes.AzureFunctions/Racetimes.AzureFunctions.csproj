@@ -19,6 +19,7 @@
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.3" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Racetimes.EventFlow.AzureEventGrid\Racetimes.EventFlow.AzureEventGrid.csproj" />
     <ProjectReference Include="..\Racetimes.Domain\Racetimes.Domain.csproj" />
     <ProjectReference Include="..\Racetimes.ReadModel.EntityFramework\Racetimes.ReadModel.EntityFramework.csproj" />
     <ProjectReference Include="..\Racetimes.ReadModel.MsSQL\Racetimes.ReadModel.MsSql.csproj" />

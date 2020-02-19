@@ -28,7 +28,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Racetimes.ReadModel.EntityF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Racetimes.ReadModel", "src\Racetimes.ReadModel\Racetimes.ReadModel.csproj", "{14135FE4-2BC8-4162-9762-53276EB3D467}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Racetimes.AzureFunctions", "src\Racetimes.AzureFunctions\Racetimes.AzureFunctions.csproj", "{DDA8C8EE-8B74-4F89-AE3D-CD6FE70CA51A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Racetimes.AzureFunctions", "src\Racetimes.AzureFunctions\Racetimes.AzureFunctions.csproj", "{DDA8C8EE-8B74-4F89-AE3D-CD6FE70CA51A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Racetimes.EventFlow.AzureEventGrid", "Racetimes.EventFlow.AzureEventGrid\Racetimes.EventFlow.AzureEventGrid.csproj", "{5C174A3A-4E1A-472E-AE17-40D022931C5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +66,10 @@ Global
 		{DDA8C8EE-8B74-4F89-AE3D-CD6FE70CA51A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDA8C8EE-8B74-4F89-AE3D-CD6FE70CA51A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDA8C8EE-8B74-4F89-AE3D-CD6FE70CA51A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C174A3A-4E1A-472E-AE17-40D022931C5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C174A3A-4E1A-472E-AE17-40D022931C5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C174A3A-4E1A-472E-AE17-40D022931C5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C174A3A-4E1A-472E-AE17-40D022931C5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

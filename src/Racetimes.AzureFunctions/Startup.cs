@@ -13,6 +13,7 @@ using Racetimes.Domain.Aggregate;
 using Racetimes.Domain.Command;
 using Racetimes.Domain.CommandHandler;
 using Racetimes.Domain.Event;
+using Racetimes.EventFlow.AzureEventGrid.Extensions;
 using Racetimes.ReadModel.EntityFramework;
 using Racetimes.ReadModel.MsSql;
 using System.IO;
@@ -41,6 +42,7 @@ namespace Racetimes.AzureFunctions
                 .UseMsSqlSnapshotStore()
                 .AddMsSqlReadModel()
                 .AddEntityFrameworkReadModel()
+                .PublishToAzureEventGrid(new EventFlow.AzureEventGrid.EventGridConfiguration())
                 .CreateResolver();
             
             // TODO: Move migration into a command line tool to be run on deployment

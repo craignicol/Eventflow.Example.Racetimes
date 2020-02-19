@@ -37,7 +37,7 @@ namespace Racetimes.AzureFunctions
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            var evts = _queryProcessor.Process(new GetAllEntriesQuery(), CancellationToken.None);
+            var evts = await _queryProcessor.ProcessAsync(new GetAllEntriesQuery(), CancellationToken.None);
 
             if (evts == null)
             {
@@ -69,7 +69,7 @@ namespace Racetimes.AzureFunctions
                 return new BadRequestObjectResult("Entry id is missing.");
             }
 
-            var evt = _queryProcessor.Process(new ReadModelByIdQuery<EntryReadModel>(EntryId.With(id)), CancellationToken.None);
+            var evt = await _queryProcessor.ProcessAsync(new ReadModelByIdQuery<EntryReadModel>(EntryId.With(id)), CancellationToken.None);
 
             if (evt == null)
             {
