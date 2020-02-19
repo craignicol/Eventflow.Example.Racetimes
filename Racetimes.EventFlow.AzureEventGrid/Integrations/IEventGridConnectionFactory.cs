@@ -1,6 +1,11 @@
-﻿namespace Racetimes.EventFlow.AzureEventGrid.Integrations
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Racetimes.EventFlow.AzureEventGrid.Integrations
 {
-    internal interface IEventGridConnectionFactory
+    public interface IEventGridConnectionFactory
     {
+        Task<IEventGridConnection> CreateConnectionAsync(Uri uri, CancellationToken cancellationToken);
     }
 }

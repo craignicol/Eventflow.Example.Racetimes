@@ -1,6 +1,8 @@
-﻿namespace Racetimes.EventFlow.AzureEventGrid.Integrations
+﻿using EventFlow.Core;
+
+namespace Racetimes.EventFlow.AzureEventGrid.Integrations
 {
-    internal interface IEventGridRetryStrategy
+    internal interface IEventGridRetryStrategy : IRetryStrategy
     {
     }
 }

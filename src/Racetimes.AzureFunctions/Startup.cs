@@ -9,10 +9,12 @@ using log4net;
 using log4net.Config;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Rest;
 using Racetimes.Domain.Aggregate;
 using Racetimes.Domain.Command;
 using Racetimes.Domain.CommandHandler;
 using Racetimes.Domain.Event;
+using Racetimes.EventFlow.AzureEventGrid;
 using Racetimes.EventFlow.AzureEventGrid.Extensions;
 using Racetimes.ReadModel.EntityFramework;
 using Racetimes.ReadModel.MsSql;
@@ -42,7 +44,7 @@ namespace Racetimes.AzureFunctions
                 .UseMsSqlSnapshotStore()
                 .AddMsSqlReadModel()
                 .AddEntityFrameworkReadModel()
-                .PublishToAzureEventGrid(new EventFlow.AzureEventGrid.EventGridConfiguration())
+                .PublishToAzureEventGrid(EventGridConfiguration.With(new System.Uri("https://example.com"), new TokenCredentials("Not a JWT")))
                 .CreateResolver();
             
             // TODO: Move migration into a command line tool to be run on deployment
