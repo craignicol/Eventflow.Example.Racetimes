@@ -27,7 +27,7 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
             return Task.FromResult<IEventGridConnection>(new EventGridConnection(_log, client));
         }
 
-        // TODO : Move this to Singleton lifecycle in Startup
+        // TODO : Move this to Singleton lifecycle in Startup?
         private IEventGridClient CreateEventGridClient(string eventGridApiKey)
         {
             TopicCredentials domainKeyCredentials = new TopicCredentials(eventGridApiKey);

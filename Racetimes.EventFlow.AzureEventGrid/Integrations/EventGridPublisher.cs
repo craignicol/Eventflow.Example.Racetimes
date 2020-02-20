@@ -31,7 +31,6 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
 
         public async Task PublishAsync(IEnumerable<EventGridMessage> eventGridMessages, CancellationToken cancellationToken)
         {
-            // TODO : logging
             var client = await _connectionFactory.CreateConnectionAsync(cancellationToken);
             await PublishAsync(client, _configuration.Hostname, eventGridMessages, cancellationToken);
             return;
@@ -49,8 +48,6 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
                 Id = de.Id,
                 EventType = de.EventType,
 
-                // TODO: Specify the name of the topic (under the domain) to which this event is destined for.
-                // Currently using a topic name "domaintopic0"
                 Topic = _configuration.TopicRoot + "racetimes",
                 Data = de.Data,
                 EventTime = de.Timestamp,
