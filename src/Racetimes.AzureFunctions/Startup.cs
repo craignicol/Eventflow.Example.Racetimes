@@ -44,7 +44,7 @@ namespace Racetimes.AzureFunctions
                 .UseMsSqlSnapshotStore()
                 .AddMsSqlReadModel()
                 .AddEntityFrameworkReadModel()
-                .PublishToAzureEventGrid(EventGridConfiguration.With(new System.Uri("https://example.com"), new TokenCredentials("Not a JWT")))
+                .PublishToAzureEventGrid(EventGridConfiguration.With("https://example.com", "Not a JWT"))
                 .CreateResolver();
             
             // TODO: Move migration into a command line tool to be run on deployment

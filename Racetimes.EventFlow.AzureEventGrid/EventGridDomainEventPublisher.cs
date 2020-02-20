@@ -1,10 +1,6 @@
 ﻿using EventFlow.Aggregates;
 using EventFlow.Subscribers;
-using Microsoft.Azure.EventGrid;
-using Microsoft.Azure.EventGrid.Models;
-using Microsoft.Rest;
 using Racetimes.EventFlow.AzureEventGrid.Integrations;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;

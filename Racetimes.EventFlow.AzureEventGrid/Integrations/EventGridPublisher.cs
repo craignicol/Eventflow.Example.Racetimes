@@ -1,7 +1,7 @@
-﻿using Microsoft.Azure.EventGrid;
+﻿using EventFlow.Core;
+using EventFlow.Logs;
+using Microsoft.Azure.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
-using Microsoft.Rest;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -11,14 +11,33 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
 {
     internal class EventGridPublisher : IEventGridPublisher
     {
-        public Task PublishAsync(IEnumerable<EventGridMessage> eventGridMessages, CancellationToken cancellationToken)
+        private readonly ILog _log;
+        private readonly IEventGridConnectionFactory _connectionFactory;
+        private readonly IEventGridConfiguration _configuration;
+        private readonly ITransientFaultHandler<IEventGridRetryStrategy> _transientFaultHandler;
+
+        public EventGridPublisher(
+            ILog log,
+            IEventGridConnectionFactory connectionFactory,
+            IEventGridConfiguration configuration,
+            ITransientFaultHandler<IEventGridRetryStrategy> transientFaultHandler
+            )
         {
-            // TODO : logging
-            var client = new EventGridClient(new BasicAuthenticationCredentials());
-            return PublishAsync(client, "http://localhost", eventGridMessages, cancellationToken);
+            _log = log;
+            _connectionFactory = connectionFactory;
+            _configuration = configuration;
+            _transientFaultHandler = transientFaultHandler;
         }
 
-        private static Task PublishAsync(IEventGridClient client, string endpoint, IEnumerable<EventGridMessage> domainEvents, CancellationToken cancellationToken)
+        public async Task PublishAsync(IEnumerable<EventGridMessage> eventGridMessages, CancellationToken cancellationToken)
+        {
+            // TODO : logging
+            var client = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+            await PublishAsync(client, _configuration.Hostname, eventGridMessages, cancellationToken);
+            return;
+        }
+
+        private static Task PublishAsync(IEventGridConnection client, string endpoint, IEnumerable<EventGridMessage> domainEvents, CancellationToken cancellationToken)
         {
             return client.PublishEventsAsync(endpoint, domainEvents.Select(de => PublishSingleMessage(de)).ToList(), cancellationToken);
         }

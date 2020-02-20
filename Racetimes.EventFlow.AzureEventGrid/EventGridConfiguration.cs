@@ -5,21 +5,21 @@ namespace Racetimes.EventFlow.AzureEventGrid
 {
     public class EventGridConfiguration : IEventGridConfiguration
     {
-        public EventGridConfiguration(Uri uri, ServiceClientCredentials credentials)
+        public EventGridConfiguration(string hostname, string apiKey)
         {
-            Uri = uri ?? throw new ArgumentNullException(nameof(uri));
-            Credentials = credentials ?? throw new ArgumentNullException(nameof(credentials));
+            Hostname = hostname ?? throw new ArgumentNullException(nameof(hostname));
+            ApiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
         }
 
-        public Uri Uri { get; }
+        public string Hostname { get; }
 
-        public ServiceClientCredentials Credentials { get; }
+        public string ApiKey { get; }
 
         public static IEventGridConfiguration With(
-            Uri uri,
-            ServiceClientCredentials credentials)
+            string hostname,
+            string apiKey)
         {
-            return new EventGridConfiguration(uri, credentials);
+            return new EventGridConfiguration(hostname, apiKey);
         }
     }
 }

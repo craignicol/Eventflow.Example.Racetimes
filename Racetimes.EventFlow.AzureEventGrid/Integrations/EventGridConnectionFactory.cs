@@ -1,8 +1,7 @@
 ﻿using EventFlow.Logs;
 using Microsoft.Azure.EventGrid;
-using Microsoft.Rest;
+using Microsoft.Azure.EventGrid.Models;
 using System;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,11 +20,19 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
             _configuration = configuration;
         }
 
-        public async Task<IEventGridConnection> CreateConnectionAsync(Uri uri, CancellationToken cancellationToken)
+        public Task<IEventGridConnection> CreateConnectionAsync(CancellationToken cancellationToken)
         {
-            var client = new EventGridClient(_configuration.Credentials);
+            var client = CreateEventGridClient(_configuration.ApiKey);
 
-            return new EventGridConnection(_log, client);
+            return Task.FromResult<IEventGridConnection>(new EventGridConnection(_log, client));
+        }
+
+        // TODO : Move this to Singleton lifecycle in Startup
+        private IEventGridClient CreateEventGridClient(string eventGridApiKey)
+        {
+            TopicCredentials domainKeyCredentials = new TopicCredentials(eventGridApiKey);
+            EventGridClient client = new EventGridClient(domainKeyCredentials);
+            return client;
         }
     }
 }

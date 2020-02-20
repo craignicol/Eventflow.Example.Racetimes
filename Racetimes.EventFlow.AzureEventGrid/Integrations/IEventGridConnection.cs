@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Azure.EventGrid.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -8,6 +9,6 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
 {
     public interface IEventGridConnection : IDisposable
     {
-        Task<int> WithModelAsync(Func<Microsoft.Azure.EventGrid.Models.EventGridEvent, Task> action, CancellationToken cancellationToken);
+        Task PublishEventsAsync(string topicHostname, IList<EventGridEvent> events, CancellationToken cancellationToken);
     }
 }

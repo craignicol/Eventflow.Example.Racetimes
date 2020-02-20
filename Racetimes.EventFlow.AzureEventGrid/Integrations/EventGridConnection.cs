@@ -10,9 +10,9 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
     public class EventGridConnection : IEventGridConnection
     {
         private ILog _log;
-        private EventGridClient _client;
+        private IEventGridClient _client;
 
-        public EventGridConnection(ILog log, EventGridClient client)
+        public EventGridConnection(ILog log, IEventGridClient client)
         {
             _log = log;
             _client = client;
@@ -20,12 +20,12 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _client.Dispose();
         }
 
-        public Task<int> WithModelAsync(Func<EventGridEvent, Task> action, CancellationToken cancellationToken)
+        public Task PublishEventsAsync(string topicHostname, System.Collections.Generic.IList<EventGridEvent> events, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return _client.PublishEventsAsync(topicHostname, events, cancellationToken);
         }
     }
 }
