@@ -39,6 +39,20 @@ This is still a work in progress but I enjoy hearing from you (especially feedba
 
 This is a fork of [dennisfabri's example](https://github.com/craignicol/Eventflow.Example.Racetimes.git) adapted to clean-up the start-up and to work with Azure Functions
 
+# Azure Event Grid configuration
+
+Create an Event Grid Topic in your Azure subscription, then create a secrets.json file as follows :
+
+```
+{
+  "EventGrid": {
+    "Endpoint": "https://<TOPIC>.<REGION>.eventgrid.azure.net/api/events",
+    "ApiKey": "<YOUR_API_KEY>",
+    "TopicRoot": "/subscriptions/<YOUR_SUBSCRIPTION>/resourceGroups/<YOUR_RESOURCE_GROUP>/providers/Microsoft.EventGrid/topics/"
+  }
+}
+```
+
 # Sources
 
 The code is based on the official documentation as well as code from the tests within the eventflow repository.
