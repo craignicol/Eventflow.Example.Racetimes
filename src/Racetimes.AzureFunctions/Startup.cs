@@ -43,7 +43,7 @@ namespace Racetimes.AzureFunctions
                 .UseMsSqlSnapshotStore()
                 .AddMsSqlReadModel()
                 .AddEntityFrameworkReadModel()
-                .PublishToAzureEventGrid(EventGridConfiguration.With(config.GetSection("EventGrid:Endpoint").Value, config.GetSection("EventGrid:ApiKey").Value))
+                .PublishToAzureEventGrid(EventGridConfiguration.With(config.GetSection("EventGrid:Endpoint").Value, config.GetSection("EventGrid:ApiKey").Value, config.GetSection("EventGrid:TopicRoot").Value))
                 .CreateResolver();
 
             // TODO: Move migration into a command line tool to be run on deployment

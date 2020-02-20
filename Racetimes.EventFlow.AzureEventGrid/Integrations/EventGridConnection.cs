@@ -25,6 +25,7 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
 
         public Task PublishEventsAsync(string topicHostname, System.Collections.Generic.IList<EventGridEvent> events, CancellationToken cancellationToken)
         {
+            _log.Debug($"Sending {events.Count} events to {topicHostname}");
             return _client.PublishEventsAsync(topicHostname, events, cancellationToken);
         }
     }

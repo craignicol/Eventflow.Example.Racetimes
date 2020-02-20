@@ -5,21 +5,24 @@ namespace Racetimes.EventFlow.AzureEventGrid
 {
     public class EventGridConfiguration : IEventGridConfiguration
     {
-        public EventGridConfiguration(string hostname, string apiKey)
+        private EventGridConfiguration(string hostname, string apiKey, string topicRoot)
         {
             Hostname = hostname ?? throw new ArgumentNullException(nameof(hostname));
             ApiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
+            TopicRoot = topicRoot ?? throw new ArgumentNullException(nameof(topicRoot)); ;
         }
 
         public string Hostname { get; }
 
         public string ApiKey { get; }
+        public string TopicRoot { get; }
 
         public static IEventGridConfiguration With(
-            string hostname,
-            string apiKey)
+            string topicEndpoint,
+            string apiKey,
+            string topicRoot)
         {
-            return new EventGridConfiguration(hostname, apiKey);
+            return new EventGridConfiguration(new Uri(topicEndpoint).Host, apiKey, topicRoot);
         }
     }
 }

@@ -37,12 +37,12 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
             return;
         }
 
-        private static Task PublishAsync(IEventGridConnection client, string endpoint, IEnumerable<EventGridMessage> domainEvents, CancellationToken cancellationToken)
+        private Task PublishAsync(IEventGridConnection client, string endpoint, IEnumerable<EventGridMessage> domainEvents, CancellationToken cancellationToken)
         {
             return client.PublishEventsAsync(endpoint, domainEvents.Select(de => PublishSingleMessage(de)).ToList(), cancellationToken);
         }
 
-        private static EventGridEvent PublishSingleMessage(EventGridMessage de)
+        private EventGridEvent PublishSingleMessage(EventGridMessage de)
         {
             return new EventGridEvent()
             {
@@ -51,7 +51,7 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
 
                 // TODO: Specify the name of the topic (under the domain) to which this event is destined for.
                 // Currently using a topic name "domaintopic0"
-                Topic = "racetimes",
+                Topic = _configuration.TopicRoot + "racetimes",
                 Data = de.Data,
                 EventTime = de.Timestamp,
                 Subject = de.Subject,
