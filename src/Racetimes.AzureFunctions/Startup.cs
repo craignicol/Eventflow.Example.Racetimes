@@ -9,7 +9,6 @@ using log4net;
 using log4net.Config;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Rest;
 using Racetimes.Domain.Aggregate;
 using Racetimes.Domain.Command;
 using Racetimes.Domain.CommandHandler;
@@ -20,14 +19,14 @@ using Racetimes.ReadModel.EntityFramework;
 using Racetimes.ReadModel.MsSql;
 using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 
 [assembly: FunctionsStartup(typeof(Racetimes.AzureFunctions.Startup))]
-
 namespace Racetimes.AzureFunctions
 {
     public class Startup : FunctionsStartup
     {
-        private IRootResolver CreateEventFlow()
+        private IRootResolver CreateEventFlow(IConfigurationRoot config)
         {
             var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
@@ -44,9 +43,9 @@ namespace Racetimes.AzureFunctions
                 .UseMsSqlSnapshotStore()
                 .AddMsSqlReadModel()
                 .AddEntityFrameworkReadModel()
-                .PublishToAzureEventGrid(EventGridConfiguration.With("https://example.com", "Not a JWT"))
+                .PublishToAzureEventGrid(EventGridConfiguration.With(config.GetSection("EventGrid:Endpoint").Value, config.GetSection("EventGrid:ApiKey").Value))
                 .CreateResolver();
-            
+
             // TODO: Move migration into a command line tool to be run on deployment
             var msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
             EventFlowEventStoresMsSql.MigrateDatabase(msSqlDatabaseMigrator);
@@ -56,7 +55,10 @@ namespace Racetimes.AzureFunctions
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services.AddSingleton(typeof(IRootResolver), CreateEventFlow());
+            var config = new ConfigurationBuilder()
+                .AddUserSecrets(Assembly.GetExecutingAssembly(), false)
+                .Build();
+            builder.Services.AddSingleton(typeof(IRootResolver), CreateEventFlow(config));
         }
     }
 }
