@@ -57,6 +57,7 @@ namespace Racetimes.AzureFunctions
         {
             var config = new ConfigurationBuilder()
                 .AddUserSecrets(Assembly.GetExecutingAssembly(), false)
+                .AddEnvironmentVariables()
                 .Build();
             builder.Services.AddSingleton(typeof(IRootResolver), CreateEventFlow(config));
         }
