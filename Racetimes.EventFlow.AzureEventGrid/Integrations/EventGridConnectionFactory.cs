@@ -11,6 +11,7 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
     {
         private readonly ILog _log;
         private readonly IEventGridConfiguration _configuration;
+        private readonly IEventGridClient _client;
 
         public EventGridConnectionFactory(
             ILog log,
@@ -18,16 +19,15 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
         {
             _log = log;
             _configuration = configuration;
+
+            _client = CreateEventGridClient(_configuration.ApiKey);
         }
 
         public Task<IEventGridConnection> CreateConnectionAsync(CancellationToken cancellationToken)
         {
-            var client = CreateEventGridClient(_configuration.ApiKey);
-
-            return Task.FromResult<IEventGridConnection>(new EventGridConnection(_log, client));
+            return Task.FromResult<IEventGridConnection>(new EventGridConnection(_log, _client));
         }
 
-        // TODO : Move this to Singleton lifecycle in Startup?
         private IEventGridClient CreateEventGridClient(string eventGridApiKey)
         {
             TopicCredentials domainKeyCredentials = new TopicCredentials(eventGridApiKey);
