@@ -29,16 +29,16 @@ namespace Racetimes.Domain.Aggregate
         public List<EntryEntity> Entries { get; } = new List<EntryEntity>();
         public bool IsDeleted { get; private set; } = false;
 
-        private static ISpecification<IDeletableAggregateRoot> IsNewSpecification = new IsNewSpecification<IDeletableAggregateRoot>();
-        private static ISpecification<IDeletableAggregateRoot> IsNotNewSpecification = new IsNotNewSpecification<IDeletableAggregateRoot>();
-        private static ISpecification<IDeletableAggregateRoot> IsDeletableSpecification = IsNotNewSpecification.And(new IsNotDeletedSpecification<IDeletableAggregateRoot>());
-        private static ISpecification<IDeletableAggregateRoot> IsRenamableSpecification = IsNotNewSpecification.And(new IsNotDeletedSpecification<IDeletableAggregateRoot>());
-        private static ISpecification<string> IsNameEnteredSpecification = new IsNotNullOrEmptySpecification("name");
-        private static ISpecification<string> IsUserEnteredSpecification = new IsNotNullOrEmptySpecification("user");
+        private static readonly ISpecification<IDeletableAggregateRoot> IsNewSpecification = new IsNewSpecification<IDeletableAggregateRoot>();
+        private static readonly ISpecification<IDeletableAggregateRoot> IsNotNewSpecification = new IsNotNewSpecification<IDeletableAggregateRoot>();
+        private static readonly ISpecification<IDeletableAggregateRoot> IsDeletableSpecification = IsNotNewSpecification.And(new IsNotDeletedSpecification<IDeletableAggregateRoot>());
+        private static readonly ISpecification<IDeletableAggregateRoot> IsRenamableSpecification = IsNotNewSpecification.And(new IsNotDeletedSpecification<IDeletableAggregateRoot>());
+        private static readonly ISpecification<string> IsNameEnteredSpecification = new IsNotNullOrEmptySpecification("name");
+        private static readonly ISpecification<string> IsUserEnteredSpecification = new IsNotNullOrEmptySpecification("user");
 
-        private static ISpecification<string> IsEntryDisciplineEnteredSpecification = new IsNotNullOrEmptySpecification("discipline");
-        private static ISpecification<string> IsEntryNameEnteredSpecification = new IsNotNullOrEmptySpecification("name");
-        private static ISpecification<int> IsEntryTimeEnteredSpecification = new IsAtLeastSpecification(1, "time");
+        private static readonly ISpecification<string> IsEntryDisciplineEnteredSpecification = new IsNotNullOrEmptySpecification("discipline");
+        private static readonly ISpecification<string> IsEntryNameEnteredSpecification = new IsNotNullOrEmptySpecification("name");
+        private static readonly ISpecification<int> IsEntryTimeEnteredSpecification = new IsAtLeastSpecification(1, "time");
 
         public CompetitionAggregate(CompetitionId id, ISnapshotStrategy snapshotStrategy) : base(id, snapshotStrategy) { }
 
