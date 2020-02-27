@@ -17,6 +17,10 @@ namespace Racetimes.EventFlow.AzureEventGrid
         public string ApiKey { get; }
         public string TopicRoot { get; }
 
+        public int MaxRetries => 3;
+
+        public double RetryDelayInMilliseconds => 25;
+
         public static IEventGridConfiguration With(
             string topicEndpoint,
             string apiKey,

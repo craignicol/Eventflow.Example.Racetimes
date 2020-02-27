@@ -8,5 +8,7 @@ namespace Racetimes.EventFlow.AzureEventGrid
         string Hostname { get; }
         string ApiKey { get; }
         string TopicRoot { get; }
+        int MaxRetries { get; }
+        double RetryDelayInMilliseconds { get; }
     }
 }

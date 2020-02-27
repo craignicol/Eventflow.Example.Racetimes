@@ -32,12 +32,17 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
         public async Task PublishAsync(IEnumerable<EventGridMessage> eventGridMessages, CancellationToken cancellationToken)
         {
             var client = await _connectionFactory.CreateConnectionAsync(cancellationToken);
-            await PublishAsync(client, _configuration.Hostname, eventGridMessages, cancellationToken);
+            await _transientFaultHandler.TryAsync(
+                (cancelToken) => PublishAsync(client, _configuration.Hostname, eventGridMessages, cancelToken),
+                Label.Named("eventgrid-publish"),
+                cancellationToken
+                ).ConfigureAwait(false);
             return;
         }
 
         private Task PublishAsync(IEventGridConnection client, string endpoint, IEnumerable<EventGridMessage> domainEvents, CancellationToken cancellationToken)
         {
+            _log.Debug($"Publishing {domainEvents.Count()} message to {endpoint} ...");
             return client.PublishEventsAsync(endpoint, domainEvents.Select(de => PublishSingleMessage(de)).ToList(), cancellationToken);
         }
 
