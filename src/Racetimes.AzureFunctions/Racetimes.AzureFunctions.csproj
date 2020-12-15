@@ -10,7 +10,7 @@
     <Exec Command="copy $(PublishDir)$(ProjectName).deps.json $(PublishDir)bin\function.deps.json" />
   </Target>
   <ItemGroup>
-    <PackageReference Include="EventFlow" Version="0.77.4077" />
+    <PackageReference Include="EventFlow" Version="0.81.4483" />
     <PackageReference Include="EventFlow.AspNetCore" Version="0.77.4077" />
     <PackageReference Include="EventFlow.DependencyInjection" Version="0.77.4077" />
     <PackageReference Include="EventFlow.MsSql" Version="0.77.4077" />
