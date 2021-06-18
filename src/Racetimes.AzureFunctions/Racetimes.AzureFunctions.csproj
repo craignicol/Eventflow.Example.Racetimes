@@ -11,14 +11,14 @@
     <Exec Command="copy $(PublishDir)$(ProjectName).deps.json $(PublishDir)bin\function.deps.json" />
   </Target>
   <ItemGroup>
-    <PackageReference Include="EventFlow" Version="0.77.4077" />
-    <PackageReference Include="EventFlow.AspNetCore" Version="0.77.4077" />
-    <PackageReference Include="EventFlow.DependencyInjection" Version="0.77.4077" />
-    <PackageReference Include="EventFlow.MsSql" Version="0.77.4077" />
-    <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.2" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.3" />
+    <PackageReference Include="EventFlow" Version="0.82.4659" />
+    <PackageReference Include="EventFlow.AspNetCore" Version="0.82.4659" />
+    <PackageReference Include="EventFlow.DependencyInjection" Version="0.82.4659" />
+    <PackageReference Include="EventFlow.MsSql" Version="0.82.4659" />
+    <PackageReference Include="log4net" Version="2.0.12" />
+    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.13" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Racetimes.EventFlow.AzureEventGrid\Racetimes.EventFlow.AzureEventGrid.csproj" />

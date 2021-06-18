@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EventFlow" Version="0.77.4077" />
-    <PackageReference Include="Microsoft.Azure.EventGrid" Version="3.2.0" />
+    <PackageReference Include="EventFlow" Version="0.82.4659" />
+    <PackageReference Include="Microsoft.Azure.EventGrid" Version="3.2.1" />
   </ItemGroup>
 
 </Project>
