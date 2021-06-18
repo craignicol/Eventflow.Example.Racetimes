@@ -26,7 +26,7 @@ namespace Racetimes.CommandLine
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static async Task Main(string[] _)
         {
             /* 
              * SETUP
@@ -34,7 +34,7 @@ namespace Racetimes.CommandLine
             var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-            using (var resolver = EventFlowOptions.New
+            using var resolver = EventFlowOptions.New
                 .AddEvents(Assembly.GetAssembly(typeof(CompetitionRegisteredEvent)))
                 .AddCommands(Assembly.GetAssembly(typeof(RegisterCompetitionCommand)), t => true)
                 .AddCommandHandlers(Assembly.GetAssembly(typeof(RegisterCompetitionHandler)))
@@ -44,50 +44,48 @@ namespace Racetimes.CommandLine
                 .UseMsSqlSnapshotStore()
                 .AddMsSqlReadModel()
                 .AddEntityFrameworkReadModel()
-                .CreateResolver())
+                .CreateResolver();
+            var msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
+            EventFlowEventStoresMsSql.MigrateDatabase(msSqlDatabaseMigrator);
+            // var sql = EventFlowEventStoresMsSql.GetSqlScripts().Select(s => s.Content).ToArray();
+
+            /* 
+             * USAGE
+             */
+
+            // Create a new identity for our aggregate root
+            var exampleId = CompetitionId.New;
+
+            // Define some important value
+            const string name = "test-competition";
+            const string name2 = "new-name";
+            const string user = "test-user";
+
+            // Resolve the command bus and use it to publish a command
+            var commandBus = resolver.Resolve<ICommandBus>();
+            var executionResult = await commandBus.PublishAsync(new RegisterCompetitionCommand(exampleId, user, name), CancellationToken.None);
+
+            executionResult = await commandBus.PublishAsync(new CorrectCompetitionCommand(exampleId, name2), CancellationToken.None);
+
+            await ReadModel.MsSql.ReadModelConfiguration.Query(resolver, exampleId);
+            await ReadModel.EntityFramework.ReadModelConfiguration.Query(resolver, exampleId);
+
+            using (var http = new HttpClient())
             {
-                var msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
-                EventFlowEventStoresMsSql.MigrateDatabase(msSqlDatabaseMigrator);
-                // var sql = EventFlowEventStoresMsSql.GetSqlScripts().Select(s => s.Content).ToArray();
+                var comp = exampleId.ToString();
 
-                /* 
-                 * USAGE
-                 */
+                var entry1Id = await RecordEntry(http, new { CompetitionId = comp, Discipline = "Discipline 1", Name = "Name 1", TimeInMillis = 11111 });
+                var entry2Id = await RecordEntry(http, new { CompetitionId = comp, Discipline = "Discipline 2", Name = "Name 2", TimeInMillis = 22222 });
+                await CorrectEntryTime(http, entry1Id, new { CompetitionId = comp, TimeInMillis = 10000 });
+                await CorrectEntryTime(http, entry2Id, new { CompetitionId = comp, TimeInMillis = 20000 });
 
-                // Create a new identity for our aggregate root
-                var exampleId = CompetitionId.New;
-
-                // Define some important value
-                const string name = "test-competition";
-                const string name2 = "new-name";
-                const string user = "test-user";
-
-                // Resolve the command bus and use it to publish a command
-                var commandBus = resolver.Resolve<ICommandBus>();
-                var executionResult = commandBus.Publish(new RegisterCompetitionCommand(exampleId, user, name), CancellationToken.None);
-
-                executionResult = commandBus.Publish(new CorrectCompetitionCommand(exampleId, name2), CancellationToken.None);
-
-                ReadModel.MsSql.ReadModelConfiguration.Query(resolver, exampleId);
-                ReadModel.EntityFramework.ReadModelConfiguration.Query(resolver, exampleId);
-
-                using (var http = new HttpClient())
+                for (int x = 1; x < 100; x++)
                 {
-                    var comp = exampleId.ToString();
-
-                    var entry1Id = await RecordEntry(http, new { CompetitionId = comp, Discipline = "Discipline 1", Name = "Name 1", TimeInMillis = 11111 });
-                    var entry2Id = await RecordEntry(http, new { CompetitionId = comp, Discipline = "Discipline 2", Name = "Name 2", TimeInMillis = 22222 });
-                    await CorrectEntryTime(http, entry1Id, new { CompetitionId = comp, TimeInMillis = 10000 });
-                    await CorrectEntryTime(http, entry2Id, new { CompetitionId = comp, TimeInMillis = 20000 });
-
-                    for (int x = 1; x < 100; x++)
-                    {
-                        await CorrectEntryTime(http, entry2Id, new { CompetitionId = comp, TimeInMillis = 2000 + x });
-                    }
-
+                    await CorrectEntryTime(http, entry2Id, new { CompetitionId = comp, TimeInMillis = 2000 + x });
                 }
-                executionResult = commandBus.Publish(new DeleteCompetitionCommand(exampleId), CancellationToken.None);
+
             }
+            executionResult = await commandBus.PublishAsync(new DeleteCompetitionCommand(exampleId), CancellationToken.None);
         }
 
         private static async Task<string> RecordEntry(HttpClient http, object data)

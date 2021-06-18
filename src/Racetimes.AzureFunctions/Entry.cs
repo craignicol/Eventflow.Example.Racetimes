@@ -26,7 +26,7 @@ namespace Racetimes.AzureFunctions
         }
 
         [FunctionName("GetEntries")]
-        public async Task<IActionResult> Run(
+        public static async Task<IActionResult> Run(
            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "entry")] HttpRequest req,
            ILogger log)
         {
@@ -36,7 +36,7 @@ namespace Racetimes.AzureFunctions
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            name ??= data?.name;
 
             return name != null
                 ? (ActionResult)new OkObjectResult($"Hello, {name}")
@@ -44,11 +44,11 @@ namespace Racetimes.AzureFunctions
         }
 
         [FunctionName("GetEntry")]
-        public async Task<IActionResult> Get(
+        public static IActionResult Get(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "entry/{id}")] HttpRequest req,
             ILogger log, string id)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation($"C# HTTP trigger function processed a request {req.Path}.");
 
             return new NotFoundObjectResult($"Entry {id} does not exist");
         }
@@ -58,6 +58,7 @@ namespace Racetimes.AzureFunctions
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "entry")] HttpRequest req,
             ILogger log)
         {
+            log.LogInformation("PostEntry called");
             EntryDTO data = await GetEntryData(req);
             if (data == null)
             {
@@ -67,7 +68,7 @@ namespace Racetimes.AzureFunctions
             var competitionId = CompetitionId.With(data.CompetitionId);
             var entryId = EntryId.New;
 
-            RecordEntryCommand recordEntryCommand = new RecordEntryCommand(competitionId, entryId, data.Discipline, data.Name, data.TimeInMillis);
+            RecordEntryCommand recordEntryCommand = new(competitionId, entryId, data.Discipline, data.Name, data.TimeInMillis);
             var result = await _eventFlow.PublishAsync(recordEntryCommand, CancellationToken.None);
 
             return result?.IsSuccess == true
@@ -80,6 +81,7 @@ namespace Racetimes.AzureFunctions
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = "entry/{id}")] HttpRequest req,
             ILogger log, string id)
         {
+            log.LogInformation($"PutEntry({id})");
             EntryDTO data = await GetEntryData(req);
             if (data == null)
             {
@@ -89,7 +91,7 @@ namespace Racetimes.AzureFunctions
             var competitionId = CompetitionId.With(data.CompetitionId);
             var entryId = EntryId.With(id);
 
-            CorrectEntryTimeCommand correctEntryTimeCommand = new CorrectEntryTimeCommand(competitionId, entryId, data.TimeInMillis);
+            CorrectEntryTimeCommand correctEntryTimeCommand = new(competitionId, entryId, data.TimeInMillis);
             var result = await _eventFlow.PublishAsync(correctEntryTimeCommand, CancellationToken.None);
 
             return result?.IsSuccess == true

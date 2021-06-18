@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using EventFlow;
 using EventFlow.Configuration;
 using EventFlow.Extensions;
@@ -21,13 +22,13 @@ namespace Racetimes.ReadModel.MsSql
                 .ConfigureMsSql(MsSqlConfiguration.New.SetConnectionString(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TimesEF;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"));
         }
 
-        public static CompetitionReadModel Query(IRootResolver resolver, CompetitionId exampleId)
+        public static Task<CompetitionReadModel> Query(IRootResolver resolver, CompetitionId exampleId)
         {
             // Resolve the query handler and use the built-in query for fetching
             // read models by identity to get our read model representing the
             // state of our aggregate root
             var queryProcessor = resolver.Resolve<IQueryProcessor>();
-            return queryProcessor.Process(new ReadModelByIdQuery<CompetitionReadModel>(exampleId), CancellationToken.None);
+            return queryProcessor.ProcessAsync(new ReadModelByIdQuery<CompetitionReadModel>(exampleId), CancellationToken.None);
         }
     }
 }
