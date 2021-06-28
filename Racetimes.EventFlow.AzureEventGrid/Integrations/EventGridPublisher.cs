@@ -12,35 +12,34 @@ namespace Racetimes.EventFlow.AzureEventGrid.Integrations
     internal class EventGridPublisher : IEventGridPublisher
     {
         private readonly ILog _log;
-        private readonly IEventGridConnectionFactory _connectionFactory;
+        private readonly IEventGridClient _client;
         private readonly IEventGridConfiguration _configuration;
         private readonly ITransientFaultHandler<IEventGridRetryStrategy> _transientFaultHandler;
 
         public EventGridPublisher(
             ILog log,
-            IEventGridConnectionFactory connectionFactory,
             IEventGridConfiguration configuration,
-            ITransientFaultHandler<IEventGridRetryStrategy> transientFaultHandler
+            ITransientFaultHandler<IEventGridRetryStrategy> transientFaultHandler,
+            IEventGridClient client
             )
         {
             _log = log;
-            _connectionFactory = connectionFactory;
+            _client = client;
             _configuration = configuration;
             _transientFaultHandler = transientFaultHandler;
         }
 
         public async Task PublishAsync(IEnumerable<EventGridMessage> eventGridMessages, CancellationToken cancellationToken)
         {
-            var client = await _connectionFactory.CreateConnectionAsync(cancellationToken);
             await _transientFaultHandler.TryAsync(
-                (cancelToken) => PublishAsync(client, _configuration.Hostname, eventGridMessages, cancelToken),
+                (cancelToken) => PublishAsync(_client, _configuration.Hostname, eventGridMessages, cancelToken),
                 Label.Named("eventgrid-publish"),
                 cancellationToken
                 ).ConfigureAwait(false);
             return;
         }
 
-        private Task PublishAsync(IEventGridConnection client, string endpoint, IEnumerable<EventGridMessage> domainEvents, CancellationToken cancellationToken)
+        private Task PublishAsync(IEventGridClient client, string endpoint, IEnumerable<EventGridMessage> domainEvents, CancellationToken cancellationToken)
         {
             _log.Debug($"Publishing {domainEvents.Count()} message to {endpoint} ...");
             return client.PublishEventsAsync(endpoint, domainEvents.Select(de => PublishSingleMessage(de)).ToList(), cancellationToken);

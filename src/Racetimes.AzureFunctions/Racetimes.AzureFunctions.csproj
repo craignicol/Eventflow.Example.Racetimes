@@ -5,7 +5,7 @@
     <UserSecretsId>1f5eab65-cf29-491c-8030-491382b93938</UserSecretsId>
   </PropertyGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy $(OutDir)$(ProjectName).deps.json $(OutDir)bin\function.deps.json" />
+    <!-- Exec Command="copy $(OutDir)$(ProjectName).deps.json $(OutDir)bin\function.deps.json" /-->
   </Target>
   <Target Name="PostPublish" BeforeTargets="Publish">
     <Exec Command="copy $(PublishDir)$(ProjectName).deps.json $(PublishDir)bin\function.deps.json" />
